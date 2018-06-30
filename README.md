@@ -84,12 +84,12 @@ To run the Ubuntu installation from the virtual hard disk, create the following 
 
 #!/bin/sh
 
-KERNEL="ubuntu/boot/vmlinuz-3.16.0-30-generic"
-INITRD="ubuntu/boot/initrd.img-3.16.0-30-generic"
+KERNEL="ubuntu/boot/vmlinuz-4.4.0-116-generic"
+INITRD="ubuntu/boot/initrd.img-4.4.0-16-generic"
 CMDLINE="earlyprintk=serial console=ttyS0 acpi=off root=/dev/vda1 ro"
 
-MEM="-m 1G"
-#SMP="-c 2"
+MEM="-m 4G"
+SMP="-c 4"
 NET="-s 2:0,virtio-net"
 IMG_HDD="-s 4,virtio-blk,ubuntu/hdd.img"
 PCI_DEV="-s 0:0,hostbridge -s 31,lpc"
@@ -99,7 +99,7 @@ build/xhyve $MEM $SMP $PCI_DEV $LPC_DEV $NET $IMG_CD $IMG_HDD -f kexec,$KERNEL,$
 
 Then run the script:
 
-$ sudo ./xhyverun_ubuntu.sh
+$ sudo ./run_xenial.sh
 
 To make your Linux installation useful, you may want to install an SSH server:
 
