@@ -8,13 +8,13 @@ $ ls -l
 total 1218560
 -rw-r--r--@ 1 mist  staff  623902720  6 Jun 22:14 ubuntu-16.04.4-server-amd64.iso
 
-# We need to extract the kernel and initrd, which is a little tricky, because OS X doesn’t # recognize the hybrid file system on the image without a little hack:
+ We need to extract the kernel and initrd, which is a little tricky, because OS X doesn’t # recognize the hybrid file system on the image without a little hack:
 
-# $ dd if=/dev/zero bs=2k count=1 of=/tmp/tmp.iso
-# $ dd if=ubuntu-16.04.4-server-amd64.iso bs=2k skip=1 >> /tmp/tmp.iso
-# $ hdiutil attach /tmp/tmp.iso
-# $ cp /Volumes/Ubuntu-Server\ 16/install/vmlinuz .
-# $ cp /Volumes/Ubuntu-Server\ 16/install/initrd.gz .
+ $ dd if=/dev/zero bs=2k count=1 of=/tmp/tmp.iso
+ $ dd if=ubuntu-16.04.4-server-amd64.iso bs=2k skip=1 >> /tmp/tmp.iso
+ $ hdiutil attach /tmp/tmp.iso
+ $ cp /Volumes/Ubuntu-Server\ 16/install/vmlinuz .
+ $ cp /Volumes/Ubuntu-Server\ 16/install/initrd.gz .
 
 Create a virtual hard disk image (16 GB in the example):
 
@@ -49,23 +49,22 @@ build/xhyve $MEM $SMP $PCI_DEV $LPC_DEV $NET $IMG_CD $IMG_HDD -f kexec,$KERNEL,$
 You will want networking enabled, so it’s easiest to run the script as root (this requirement is lifted if you codesign the binary):
 
 $ sudo ./install.sh
+-You will see the Ubuntu text mode installer:
 
-You will see the Ubuntu text mode installer:
-
-  ┌───────────────────────┤ [!!] Select a language ├────────────────────────┐
-  │                                                                         │
-  │ Choose the language to be used for the installation process. The        │
-  │ selected language will also be the default language for the installed   │
-  │ system.                                                                 │
-  │                                                                         │
-  │ Language:                                                               │
-  │                                                                         │
-  │                               C                                         │
-  │                               English                                   │
-  │                                                                         │
-  │     <Go Back>                                                           │
-  │                                                                         │
-  └─────────────────────────────────────────────────────────────────────────┘
+  - ┌───────────────────────┤ [!!] Select a language ├────────────────────────┐
+  - │                                                                         │
+  - │ Choose the language to be used for the installation process. The        │
+  - │ selected language will also be the default language for the installed   │
+  - │ system.                                                                 │
+  - │                                                                         │
+  - │ Language:                                                               │
+  - │                                                                         │
+  - │                               C                                         │
+  - │                               English                                   │
+  - │                                                                         │
+  - │     <Go Back>                                                           │
+  - │                                                                         │
+  - └─────────────────────────────────────────────────────────────────────────┘
 
 <Tab> moves; <Space> selects; <Enter> activates buttons
 
@@ -73,9 +72,9 @@ All answers should be straightforward, and the defaults are usually fine. Make s
 
 At the very end, on the “Installation complete” screen, select “Go back” and “Execute a shell”, so you can copy the installed kernel and initrd to the Mac side. In the VM, type this:
 
-# cd /target
-# sbin/ifconfig
-# tar c boot | nc -l -p 1234
+ cd /target
+  sbin/ifconfig
+ tar c boot | nc -l -p 1234
 
 On the Mac, type this, replacing the IP with the output from ifconfig before:
 
@@ -84,7 +83,7 @@ $ nc 192.168.64.7 1234 | tar x
 
 In the VM, exit the shell:
 
-# exit
+ exit
 
 Then select “Finish the installation”.
 
