@@ -8,13 +8,13 @@ $ ls -l
 total 1218560
 -rw-r--r--@ 1 mist  staff  623902720  6 Jun 22:14 ubuntu-16.04.4-server-amd64.iso
 
-We need to extract the kernel and initrd, which is a little tricky, because OS X doesn’t recognize the hybrid file system on the image without a little hack:
+# We need to extract the kernel and initrd, which is a little tricky, because OS X doesn’t # recognize the hybrid file system on the image without a little hack:
 
-$ dd if=/dev/zero bs=2k count=1 of=/tmp/tmp.iso
-$ dd if=ubuntu-16.04.4-server-amd64.iso bs=2k skip=1 >> /tmp/tmp.iso
-$ hdiutil attach /tmp/tmp.iso
-$ cp /Volumes/Ubuntu-Server\ 16/install/vmlinuz .
-$ cp /Volumes/Ubuntu-Server\ 16/install/initrd.gz .
+# $ dd if=/dev/zero bs=2k count=1 of=/tmp/tmp.iso
+# $ dd if=ubuntu-16.04.4-server-amd64.iso bs=2k skip=1 >> /tmp/tmp.iso
+# $ hdiutil attach /tmp/tmp.iso
+# $ cp /Volumes/Ubuntu-Server\ 16/install/vmlinuz .
+# $ cp /Volumes/Ubuntu-Server\ 16/install/initrd.gz .
 
 Create a virtual hard disk image (16 GB in the example):
 
