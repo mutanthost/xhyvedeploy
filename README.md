@@ -16,9 +16,17 @@ $ hdiutil attach /tmp/tmp.iso
 $ cp /Volumes/Ubuntu-Server\ 16/install/vmlinuz .
 $ cp /Volumes/Ubuntu-Server\ 16/install/initrd.gz .
 
-Create a virtual hard disk image (8 GB in the example):
+Create a virtual hard disk image (16 GB in the example):
 
-$ dd if=/dev/zero of=hdd.img bs=1g count=8
+
+I have a habit of silo'ing off top level directories
+so I started by creating
+cd /
+sudo mkdir XHYVE
+sudo chown -R matt:staff /XHYVE
+
+
+$ dd if=/dev/zero of=hdd.img bs=1g count=16
 
 Then create a script to run xhyve with the correct arguments for the installer:
 
@@ -28,10 +36,10 @@ KERNEL="ubuntu/vmlinuz"
 INITRD="ubuntu/initrd.gz"
 CMDLINE="earlyprintk=serial console=ttyS0 acpi=off"
 
-MEM="-m 1G"
-#SMP="-c 2"
+MEM="-m 4G"
+SMP="-c 4"
 NET="-s 2:0,virtio-net"
-IMG_CD="-s 3,ahci-cd,ubuntu/ubuntu-14.04.2-server-amd64.iso"
+IMG_CD="-s 3,ahci-cd,ubuntu/ubuntu-16.04.4-server-amd64.iso"
 IMG_HDD="-s 4,virtio-blk,ubuntu/hdd.img"
 PCI_DEV="-s 0:0,hostbridge -s 31,lpc"
 LPC_DEV="-l com1,stdio"
@@ -40,7 +48,7 @@ build/xhyve $MEM $SMP $PCI_DEV $LPC_DEV $NET $IMG_CD $IMG_HDD -f kexec,$KERNEL,$
 
 You will want networking enabled, so it’s easiest to run the script as root (this requirement is lifted if you codesign the binary):
 
-$ sudo ./xhyverun_ubuntu_install.sh
+$ sudo ./install.sh
 
 You will see the Ubuntu text mode installer:
 
