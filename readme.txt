@@ -1,3 +1,5 @@
+This all has a prerequisite of a nice brew installed ; )
+
 Running Ubuntu on xhyve
 
 You can also install a more complete Linux distribution on xhyve. The tricky bit is that xhyve doesn’t come with a BIOS or EFI booter, so it is necessary to extract the kernel and initrd from the Linux image and pass them to xhyve manually.
