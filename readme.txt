@@ -1,3 +1,4 @@
+This all has a prerequisite of a nice brew installed ; )
 
 Running Ubuntu on xhyve
 
