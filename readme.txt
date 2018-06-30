@@ -91,7 +91,7 @@ To run the Ubuntu installation from the virtual hard disk, create the following 
 
 #!/bin/sh
 
-KERNEL="ubuntu/boot/vmlinuz-4.4.0-116-generic"
+KERNEL="ubuntu/boot/vmlinuz-4.4.0-16-generic"
 INITRD="ubuntu/boot/initrd.img-4.4.0-16-generic"
 CMDLINE="earlyprintk=serial console=ttyS0 acpi=off root=/dev/vda1 ro"
 
