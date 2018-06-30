@@ -1,3 +1,114 @@
+Running Ubuntu on xhyve
+
+You can also install a more complete Linux distribution on xhyve. The tricky bit is that xhyve doesn’t come with a BIOS or EFI booter, so it is necessary to extract the kernel and initrd from the Linux image and pass them to xhyve manually.
+
+First download Ubuntu Server (the desktop version doesn’t support the text mode installer) into the directory “ubuntu” inside the “xhyve” directory:
+
+$ ls -l
+total 1218560
+-rw-r--r--@ 1 mist  staff  623902720  6 Jun 22:14 ubuntu-14.04.2-server-amd64.iso
+
+We need to extract the kernel and initrd, which is a little tricky, because OS X doesn’t recognize the hybrid file system on the image without a little hack:
+
+$ dd if=/dev/zero bs=2k count=1 of=/tmp/tmp.iso
+$ dd if=ubuntu-16.04.4-server-amd64.iso bs=2k skip=1 >> /tmp/tmp.iso
+$ hdiutil attach /tmp/tmp.iso
+$ cp /Volumes/Ubuntu-Server\ 16/install/vmlinuz .
+$ cp /Volumes/Ubuntu-Server\ 16/install/initrd.gz .
+
+Create a virtual hard disk image (8 GB in the example):
+
+$ dd if=/dev/zero of=hdd.img bs=1g count=8
+
+Then create a script to run xhyve with the correct arguments for the installer:
+
+#!/bin/sh
+
+KERNEL="ubuntu/vmlinuz"
+INITRD="ubuntu/initrd.gz"
+CMDLINE="earlyprintk=serial console=ttyS0 acpi=off"
+
+MEM="-m 1G"
+#SMP="-c 2"
+NET="-s 2:0,virtio-net"
+IMG_CD="-s 3,ahci-cd,ubuntu/ubuntu-14.04.2-server-amd64.iso"
+IMG_HDD="-s 4,virtio-blk,ubuntu/hdd.img"
+PCI_DEV="-s 0:0,hostbridge -s 31,lpc"
+LPC_DEV="-l com1,stdio"
+
+build/xhyve $MEM $SMP $PCI_DEV $LPC_DEV $NET $IMG_CD $IMG_HDD -f kexec,$KERNEL,$INITRD,"$CMDLINE"
+
+You will want networking enabled, so it’s easiest to run the script as root (this requirement is lifted if you codesign the binary):
+
+$ sudo ./xhyverun_ubuntu_install.sh
+
+You will see the Ubuntu text mode installer:
+
+  ┌───────────────────────┤ [!!] Select a language ├────────────────────────┐
+  │                                                                         │
+  │ Choose the language to be used for the installation process. The        │
+  │ selected language will also be the default language for the installed   │
+  │ system.                                                                 │
+  │                                                                         │
+  │ Language:                                                               │
+  │                                                                         │
+  │                               C                                         │
+  │                               English                                   │
+  │                                                                         │
+  │     <Go Back>                                                           │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+<Tab> moves; <Space> selects; <Enter> activates buttons
+
+All answers should be straightforward, and the defaults are usually fine. Make sure to select “Yes” when asked “Install the GRUB boot loader to the master boot record”.
+
+At the very end, on the “Installation complete” screen, select “Go back” and “Execute a shell”, so you can copy the installed kernel and initrd to the Mac side. In the VM, type this:
+
+# cd /target
+# sbin/ifconfig
+# tar c boot | nc -l -p 1234
+
+On the Mac, type this, replacing the IP with the output from ifconfig before:
+
+$ cd ubuntu
+$ nc 192.168.64.7 1234 | tar x
+
+In the VM, exit the shell:
+
+# exit
+
+Then select “Finish the installation”.
+
+To run the Ubuntu installation from the virtual hard disk, create the following script, fixing up the kernel and initrd version numbers:
+
+#!/bin/sh
+
+KERNEL="ubuntu/boot/vmlinuz-3.16.0-30-generic"
+INITRD="ubuntu/boot/initrd.img-3.16.0-30-generic"
+CMDLINE="earlyprintk=serial console=ttyS0 acpi=off root=/dev/vda1 ro"
+
+MEM="-m 1G"
+#SMP="-c 2"
+NET="-s 2:0,virtio-net"
+IMG_HDD="-s 4,virtio-blk,ubuntu/hdd.img"
+PCI_DEV="-s 0:0,hostbridge -s 31,lpc"
+LPC_DEV="-l com1,stdio"
+
+build/xhyve $MEM $SMP $PCI_DEV $LPC_DEV $NET $IMG_CD $IMG_HDD -f kexec,$KERNEL,$INITRD,"$CMDLINE"
+
+Then run the script:
+
+$ sudo ./xhyverun_ubuntu.sh
+
+To make your Linux installation useful, you may want to install an SSH server:
+
+$ sudo apt-get install openssh-server
+
+
+
+
+
 # [xhyve.org](http://www.xhyve.org)
 
 ![](./xhyve_logo.png)
@@ -28,7 +139,7 @@ If you have homebrew, then simply:
 
 The `--HEAD` in the brew command ensures that you always get the latest changes, even if the homebrew database is not yet updated. If for any reason you don't want that simply do `brew install xhyve` .
 
-if not then:  
+if not then:
 
 Building
 --------
@@ -152,7 +263,7 @@ xhyve architecture
         ------------------------------┼------------------------------
                                       |syscall            xnu kernel
                                       V
-        
+
                                    VMX host
                                VMX nested paging
 
@@ -224,10 +335,10 @@ TODO
 - remove vestigial code, cleanup
 
 
-ADDED 
+ADDED
 ———
  - just some edits for  xhyvedeploy
  - Builds xhyve runs 4 x 4 CPU RAM creates hdd.img optional codesign on Hypervisor.framework with 16.04
  - the ubuntu directory is empty but should contain
- - 
- - 
+ -
+ -
