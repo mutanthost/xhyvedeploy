@@ -97,6 +97,10 @@ $ sudo ./install.sh
 
 All answers should be straightforward, and the defaults are usually fine. Make sure to select “Yes” when asked “Install the GRUB boot loader to the master boot record”.
 
+
+******* STOP DONT REALLY PLEASE *********
+in best Gene Wilder voice
+
 At the very end, on the “Installation complete” screen, select “Go back” and “Execute a shell”, so you can copy the installed kernel and initrd to the Mac side. In the VM, type this:
 
  cd /target
