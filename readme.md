@@ -8,6 +8,7 @@ processes on your aluminum shiv?
 Check if you can of course:
 
 $ sysctl  kern.hv_support
+
 kern.hv_support: 1
 
 The actually pretty easy and clean part is that xhyve doesn’t come with a BIOS or EFI booter,
@@ -23,10 +24,15 @@ total 1218560
  is easily used to hypervisor 
 
  $ dd if=/dev/zero bs=2k count=1 of=/tmp/tmp.iso
+ 
  $ dd if=ubuntu-16.04.4-server-amd64.iso bs=2k skip=1 >> /tmp/tmp.iso
+ 
  $ hdiutil attach /tmp/tmp.iso
- $ cp /Volumes/Ubuntu-Server\ 16/install/vmlinuz .
- $ cp /Volumes/Ubuntu-Server\ 16/install/initrd.gz .
+ 
+ $ cp /Volumes/Ubuntu-Server\ 16/install/vmlinuz . 
+ 
+ $ cp /Volumes/Ubuntu-Server\ 16/install/initrd.gz . 
+ 
 
 Create a virtual hard disk image (16 GB in the example):
 
@@ -45,15 +51,24 @@ Then create a script to run xhyve with the correct arguments for the installer:
 #!/bin/sh
 
 KERNEL="ubuntu/vmlinuz"
+
 INITRD="ubuntu/initrd.gz"
+
 CMDLINE="earlyprintk=serial console=ttyS0 acpi=off"
 
+
 MEM="-m 4G"
+
 SMP="-c 4"
+
 NET="-s 2:0,virtio-net"
+
 IMG_CD="-s 3,ahci-cd,ubuntu/ubuntu-16.04.4-server-amd64.iso"
+
 IMG_HDD="-s 4,virtio-blk,ubuntu/hdd.img"
+
 PCI_DEV="-s 0:0,hostbridge -s 31,lpc"
+
 LPC_DEV="-l com1,stdio"
 
 build/xhyve $MEM $SMP $PCI_DEV $LPC_DEV $NET $IMG_CD $IMG_HDD -f kexec,$KERNEL,$INITRD,"$CMDLINE"
