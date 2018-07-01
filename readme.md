@@ -3,7 +3,15 @@ This all has a prerequisite of a nice brew installed ; )
 <img src="https://github.com/mutanthost/xhyvedeploy/6point_font_music.jpg"/>
 Running Ubuntu on xhyve
 
-You can also install a more complete Linux distribution on xhyve. The tricky bit is that xhyve doesn’t come with a BIOS or EFI booter, so it is necessary to extract the kernel and initrd from the Linux image and pass them to xhyve manually.
+Why not have a repeatable, clean, VM running on less than the sum of many background
+processes on your aluminum shiv?
+Check if you can of course:
+
+$ sysctl  kern.hv_support
+kern.hv_support: 1
+
+The actually pretty easy and clean part is that xhyve doesn’t come with a BIOS or EFI booter,
+so it is necessary to extract the kernel and initrd from the Linux image and pass them to xhyve manually.
 
 First download Ubuntu Server (the desktop version doesn’t support the text mode installer) into the directory “ubuntu” inside the “xhyve” directory:
 
@@ -11,7 +19,8 @@ $ ls -l
 total 1218560
 -rw-r--r--@ 1 mist  staff  623902720  6 Jun 22:14 ubuntu-16.04.4-server-amd64.iso
 
- We need to extract the kernel and initrd, which is a little tricky, because OS X doesn’t # recognize the hybrid file system on the image without a little hack:
+ Let us extract the kernel and initrd, which is super easy, because el capitan
+ is easily used to hypervisor 
 
  $ dd if=/dev/zero bs=2k count=1 of=/tmp/tmp.iso
  $ dd if=ubuntu-16.04.4-server-amd64.iso bs=2k skip=1 >> /tmp/tmp.iso
